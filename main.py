@@ -9,7 +9,8 @@ ID_LEN = 7
 
 
 def get_html(id_url):
-    url = f"https://i.imgur.com/{id_url}.png"
+    url = f'https://imgpile.com/images/{id_url}.png'
+    #url = f"https://i.imgur.com/{id_url}.png"
 
     headers = {
         'sec-ch-ua': "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"99\", \"Google Chrome\";v=\"99\"",
@@ -37,21 +38,26 @@ def save(binary_data, img_id):
 def main():
     all_strings = string.ascii_lowercase + string.ascii_uppercase + string.digits
     while True:
-        random_id = ''.join([random.choice(all_strings) for _ in range(ID_LEN)])
-        video_stats = get_html(random_id)
-        if random_id not in open('invalid.txt', 'r').read():
-            if video_stats[1] != -1:
-                print(f'VALID: https://i.imgur.com/{random_id}.png')
-                save(video_stats[1], random_id)
+        try:
+            random_id = ''.join([random.choice(all_strings) for _ in range(ID_LEN)])
+            random_id = 'nnH30G'
+            video_stats = get_html(random_id)
+            if random_id not in open('invalid.txt', 'r').read():
+                if video_stats[1] != -1:
+                    print(f'VALID: https://i.imgur.com/{random_id}.png')
+                    save(video_stats[1], random_id)
 
-            else:
-                if video_stats[0] != 404 and video_stats[0] != 200:
-                    print('Something Happened!')
-                    print(f'id: {random_id} code: {video_stats[0]}')
+                else:
+                    if video_stats[0] != 404 and video_stats[0] != 200:
+                        print('Something Happened!')
+                        print(f'id: {random_id} code: {video_stats[0]}')
 
-                with open(f'invalid.txt', 'a', encoding='utf-8') as f:
-                    f.writelines(f'{random_id}\n')
-                f.close()
+                    with open(f'invalid.txt', 'a', encoding='utf-8') as f:
+                        f.writelines(f'{random_id}\n')
+                    f.close()
+        except Exception as e:
+            print(f'error network!')
+
 
 if __name__ == '__main__':
     n = int(input('Threads: '))
