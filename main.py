@@ -40,7 +40,7 @@ def main():
     while True:
         try:
             random_id = ''.join([random.choice(all_strings) for _ in range(ID_LEN)])
-            random_id = 'nnH30G'
+            # random_id = 'nnH30G'
             video_stats = get_html(random_id)
             if random_id not in open('invalid.txt', 'r').read():
                 if video_stats[1] != -1:
