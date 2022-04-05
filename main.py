@@ -8,9 +8,9 @@ INVALID_IMG = b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\xa1\x00\x00\x00Q
 ID_LEN = 7
 
 
-def get_html(id_url):
-    #url = f'https://imgpile.com/images/{id_url}.png'
-    url = f"https://i.imgur.com/{id_url}.png"
+def get_html(id_url, extension='png'):
+    # url = f'https://imgpile.com/images/{id_url}.png'
+    url = f"https://i.imgur.com/{id_url}.{extension}"
 
     headers = {
         'sec-ch-ua': "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"99\", \"Google Chrome\";v=\"99\"",
@@ -24,13 +24,16 @@ def get_html(id_url):
 
     response = requests.request("GET", url, headers=headers)
     if response.status_code == 200 and response.content != INVALID_IMG:
-        return response.status_code, response.content
+        return response.status_code, response.content, extension
     else:
-        return response.status_code, -1
+        return response.status_code, -1, -1
 
 
-def save(binary_data, img_id):
-    with open(f'IMGs/{img_id}.png', 'wb') as f:
+def save(binary_data, img_id, extension):
+    folder = 'IMGs'
+    if extension == 'mp4':
+        folder = 'Videos'
+    with open(f'{folder}/{img_id}.{extension}', 'wb') as f:
         f.write(binary_data)
     f.close()
 
@@ -40,12 +43,15 @@ def main():
     while True:
         try:
             random_id = ''.join([random.choice(all_strings) for _ in range(ID_LEN)])
-            # random_id = 'nnH30G'
             video_stats = get_html(random_id)
             if random_id not in open('invalid.txt', 'r').read():
                 if video_stats[1] != -1:
-                    print(f'VALID: https://i.imgur.com/{random_id}.png')
-                    save(video_stats[1], random_id)
+                    print(f'VALID: https://i.imgur.com/{random_id}.{video_stats[2]}')
+                    save(video_stats[1], random_id, video_stats[2])
+                    video_stats = get_html(random_id, extension='mp4')
+                    if video_stats[1] != -1:
+                        print(f'VALID VIDEO: https://i.imgur.com/{random_id}.{video_stats[2]}')
+                        save(video_stats[1], random_id, video_stats[2])
 
                 else:
                     if video_stats[0] != 404 and video_stats[0] != 200:
